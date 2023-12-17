@@ -2,7 +2,7 @@ package helpers
 
 import (
 	"database/sql"
-	_ "github.com/mattn/go-sqlite3"
+	_"github.com/mattn/go-sqlite3"
 	"github.com/sirupsen/logrus"
 )
 
@@ -10,7 +10,10 @@ func OpenDb() (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", "file:musiques.db")
 	if err != nil {
 		db.SetMaxOpenConns(1)
+		logrus.Fatal(err)
 	}
+
+	logrus.Info("Connected to the Db")
 
 	return db, err
 
