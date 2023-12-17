@@ -1,23 +1,25 @@
 package musiques
+
 import (
 	"database/sql"
 	"errors"
-	_ "github.com/gofrs/uuid"
-	"github.com/sirupsen/logrus"
+	"net/http"
 	"tchipify/musiques/internal/models"
 	repository "tchipify/musiques/internal/repositories/musiques"
-	"net/http"
+
+	_ "github.com/gofrs/uuid"
+	"github.com/sirupsen/logrus"
 )
 
 func GetAllSongs() ([]models.Song, error) {
 	var err error
 
 	songs, err := repository.GetAllSongs()
-	if (err != nil) {
+	if err != nil {
 		logrus.Error("cannot retrieving songs : ", err.Error())
 		return nil, &models.CustomError{
 			Message: "something went wrong",
-			Code : 500,
+			Code:    500,
 		}
 	}
 	return songs, nil
@@ -54,5 +56,3 @@ func AddSong(song models.Song) (int64, error) {
 
 	return id, nil
 }
-
-
