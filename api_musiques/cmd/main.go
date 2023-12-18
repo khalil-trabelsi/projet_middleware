@@ -1,10 +1,11 @@
-package main 
+package main
 
 import (
-	"tchipify/musiques/internal/helpers"
-	_"tchipify/musiques/internal/models"
-	"tchipify/musiques/internal/controllers/musiques"
 	"net/http"
+	"tchipify/musiques/internal/controllers/musiques"
+	"tchipify/musiques/internal/helpers"
+	_ "tchipify/musiques/internal/models"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/sirupsen/logrus"
 )
@@ -12,13 +13,13 @@ import (
 func main() {
 	r := chi.NewRouter()
 
-	r.Route("/songs", func(r chi.Router) {
+	r.Route("/api/v1/songs", func(r chi.Router) {
 		r.Get("/", musiques.GetSongs)
 		r.Route("/{id}", func(r chi.Router) {
 			r.Use(musiques.Ctx)
 			r.Get("/", musiques.GetSong)
 		})
-		r.Post("/", musiques.AddSong);
+		r.Post("/", musiques.AddSong)
 	})
 
 	logrus.Info("[INFO] Web server started. Now listening on *:8080")
@@ -45,4 +46,3 @@ func init() {
 	}
 	helpers.CloseDb(db)
 }
-
