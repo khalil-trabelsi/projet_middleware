@@ -47,7 +47,7 @@ func GetSongById(id int) (*models.Song, error) {
 func AddSong(song models.Song) (int64, error) {
 	id, err := repository.AddSong(song)
 	if err != nil {
-		logrus.Errorf("error create ressource : %s", err.Error())
+		logrus.Errorf("error creating ressource : %s", err.Error())
 		return 0, &models.CustomError{
 			Message: "Something went wrong",
 			Code:    422,
@@ -55,4 +55,17 @@ func AddSong(song models.Song) (int64, error) {
 	}
 
 	return id, nil
+}
+
+func DeleteSong(idSong int) error {
+	err := repository.DeleteSong(idSong)
+	if err != nil {
+		logrus.Errorf("error deleting ressource : %s", err.Error())
+		return &models.CustomError{
+			Message: "Something went wrong",
+			Code:    500,
+		}
+	}
+
+	return nil
 }
