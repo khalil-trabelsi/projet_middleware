@@ -19,6 +19,7 @@ func main() {
 			r.Use(ratings.Ctx)
 			r.Get("/", ratings.GetRating)
 			r.Delete("/", ratings.DeleteRating)
+			r.Put("/", ratings.UpdateRating)
 		})
 		r.Post("/", ratings.InsertRating)
 
@@ -35,12 +36,12 @@ func init() {
 		logrus.Fatalf("error while opening database : %s", err.Error())
 	}
 	schemes := []string{
-		`CREATE TABLE IF NOT EXISTS ratings (
+		`CREATE TABLE IF NOT EXISTS rating (
 			id INTEGER  PRIMARY KEY AUTOINCREMENT,
 			song_id INTEGER NOT NULL,
             user_id INTEGER NOT NULL,
             comment VARCHAR(300) NOT NULL,
-			rating REAL CHECK (rating BETWEEN 0 AND 5)
+			note REAL CHECK (note BETWEEN 0 AND 5)
 		);`,
 	}
 	for _, scheme := range schemes {

@@ -12,7 +12,7 @@ func GetAllRatings() ([]models.Rating, error) {
 	if err != nil {
 		return nil, err
 	}
-	rows, err := db.Query("SELECT * FROM ratings")
+	rows, err := db.Query("SELECT * FROM rating")
 	helpers.CloseDb(db)
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func GetRatingById(id int) (*models.Rating, error) {
 
 		return nil, err
 	}
-	row := db.QueryRow("SELECT * FROM ratings WHERE id=?", id)
+	row := db.QueryRow("SELECT * FROM rating WHERE id=?", id)
 	helpers.CloseDb(db)
 
 	var rating models.Rating
@@ -60,7 +60,7 @@ func CreateRating(rating models.Rating) (int64, error) {
 	}
 	defer helpers.CloseDb(db)
 
-	result, err := db.Exec("INSERT INTO ratings (song_id, user_id, comment, rating ) VALUES (?, ?, ?, ?)",
+	result, err := db.Exec("INSERT INTO rating (song_id, user_id, comment, note ) VALUES (?, ?, ?, ?)",
 		rating.SongId, rating.UserId, rating.Comment, rating.Note)
 	if err != nil {
 		logrus.Errorf("Erreur lors de l'insertion du rating dans la base de données : %s", err.Error())
@@ -72,6 +72,23 @@ func CreateRating(rating models.Rating) (int64, error) {
 	}
 	return id, nil
 }
+func UpdateRating(ratingID int, rating models.Rating) error {
+	db, err := helpers.OpenDb()
+	if err != nil {
+		logrus.Errorf("Error when opening DB: %s", err.Error())
+		return err
+	}
+	res, err := db.Exec("UPDATE rating SET user_id = ?, song_id= ?, comment = ?, note = ? WHERE id = ?", rating.UserId, rating.SongId, rating.Comment, rating.Note, ratingID)
+
+	rows, err := res.RowsAffected()
+	logrus.Printf("%d", rows)
+	defer helpers.CloseDb(db)
+	if err != nil {
+		logrus.Errorf("Repository : Error in updating rating %s", err.Error())
+		return err
+	}
+	return nil
+}
 
 func DeleteRating(ratingID int) error {
 	db, err := helpers.OpenDb()
@@ -81,7 +98,7 @@ func DeleteRating(ratingID int) error {
 	}
 	defer helpers.CloseDb(db)
 
-	_, err = db.Exec("DELETE FROM ratings WHERE id=?", ratingID)
+	_, err = db.Exec("DELETE FROM rating WHERE id=?", ratingID)
 	if err != nil {
 		logrus.Errorf("Erreur lors de la suppression du rating dans la base de données : %s", err.Error())
 		return err

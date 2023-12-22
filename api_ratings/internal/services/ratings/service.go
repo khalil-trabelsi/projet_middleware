@@ -66,3 +66,16 @@ func DeleteRating(ratingID int) error {
 
 	return nil
 }
+
+func UpdateRating(ratingID int, song models.Rating) error {
+	err := repository.UpdateRating(ratingID, song)
+	if err != nil {
+		logrus.Errorf("error updating ressource : %s", err.Error())
+		return &models.CustomError{
+			Message: "Something went wrong",
+			Code:    500,
+		}
+	}
+
+	return nil
+}
