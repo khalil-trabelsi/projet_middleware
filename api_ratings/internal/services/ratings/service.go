@@ -44,3 +44,15 @@ func GetRatingById(id int) (*models.Rating, error) {
 
 	return rating, err
 }
+
+func CreateRating(rating models.Rating) (int64, error) {
+	id, err := repository.CreateRating(rating)
+	if err != nil {
+		logrus.Errorf("Erreur lors de la création du rating : %s", err.Error())
+		return 0, &models.CustomError{
+			Message: "Something went wrong",
+			Code:    422,
+		}
+	}
+	return id, nil
+}

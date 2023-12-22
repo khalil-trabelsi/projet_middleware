@@ -11,14 +11,21 @@ import (
 )
 
 func main() {
-	router := chi.NewRouter()
+	r := chi.NewRouter()
 	// Our routes
-	router.Get("/ratings", ratings.GetRatings)
-	router.Get("/ratings/{id}", ratings.GetRating)
+	r.Route("/ratings", func(r chi.Router) {
+		r.Get("/", ratings.GetRatings)
+		r.Route("/{id}", func(r chi.Router) {
+			r.Use(ratings.Ctx)
+			r.Get("/", ratings.GetRating)
+		})
+		r.Post("/", ratings.InsertRating)
+
+	})
 	// router.Put("/ratings/{id}", ratings.UpdateRating)
 	// router.Delete("/ratings/{id}", ratings.DeleteRating)
 	logrus.Info("[INFO] Web server started. Now listening on *:8084")
-	logrus.Fatalln(http.ListenAndServe(":8084", router))
+	logrus.Fatalln(http.ListenAndServe(":8084", r))
 }
 
 func init() {

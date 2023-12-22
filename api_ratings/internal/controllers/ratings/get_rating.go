@@ -14,10 +14,9 @@ import (
 func GetRating(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	ratingId, _ := ctx.Value("songId").(int)
-
 	rating, err := ratings.GetRatingById(ratingId)
 	if err != nil {
-		logrus.Errorf("error : %s", err.Error())
+		logrus.Errorf("error in controller : %s", err.Error())
 		customError, isCustom := err.(*models.CustomError)
 		if isCustom {
 			w.WriteHeader(customError.Code)
