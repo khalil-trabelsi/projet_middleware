@@ -13,7 +13,7 @@ import (
 
 func GetRating(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	ratingId, _ := ctx.Value("songId").(int)
+	ratingId, _ := ctx.Value("ratingId").(int)
 	rating, err := ratings.GetRatingById(ratingId)
 	if err != nil {
 		logrus.Errorf("error in controller : %s", err.Error())

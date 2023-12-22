@@ -56,3 +56,13 @@ func CreateRating(rating models.Rating) (int64, error) {
 	}
 	return id, nil
 }
+
+func DeleteRating(ratingID int) error {
+	err := repository.DeleteRating(ratingID)
+	if err != nil {
+		logrus.Errorf("Erreur lors de la suppression du commentaire : %s", err.Error())
+		return err
+	}
+
+	return nil
+}

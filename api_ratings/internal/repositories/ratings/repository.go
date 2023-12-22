@@ -72,3 +72,20 @@ func CreateRating(rating models.Rating) (int64, error) {
 	}
 	return id, nil
 }
+
+func DeleteRating(ratingID int) error {
+	db, err := helpers.OpenDb()
+	if err != nil {
+		logrus.Errorf("Erreur lors de l'ouverture de la base de données : %s", err.Error())
+		return err
+	}
+	defer helpers.CloseDb(db)
+
+	_, err = db.Exec("DELETE FROM ratings WHERE id=?", ratingID)
+	if err != nil {
+		logrus.Errorf("Erreur lors de la suppression du rating dans la base de données : %s", err.Error())
+		return err
+	}
+
+	return nil
+}

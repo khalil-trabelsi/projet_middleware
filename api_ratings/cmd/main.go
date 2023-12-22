@@ -18,6 +18,7 @@ func main() {
 		r.Route("/{id}", func(r chi.Router) {
 			r.Use(ratings.Ctx)
 			r.Get("/", ratings.GetRating)
+			r.Delete("/", ratings.DeleteRating)
 		})
 		r.Post("/", ratings.InsertRating)
 
