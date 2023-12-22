@@ -13,11 +13,12 @@ import (
 func main() {
 	r := chi.NewRouter()
 
-	r.Route("/api/v1/songs", func(r chi.Router) {
+	r.Route("/songs", func(r chi.Router) {
 		r.Get("/", musiques.GetSongs)
 		r.Route("/{id}", func(r chi.Router) {
 			r.Use(musiques.Ctx)
 			r.Get("/", musiques.GetSong)
+			r.Delete("/", musiques.DeleteSong)
 		})
 		r.Post("/", musiques.AddSong)
 	})
