@@ -57,7 +57,9 @@ func AddSong(song models.Song) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	result, err := db.Exec("INSERT INTO musiques (id, artistName, title, durationInMillis) VALUES  (?, ?, ?, ?)", song.Id, song.ArtistName, song.Title, song.DurationInMillis)
+
+	result, err := db.Exec("INSERT INTO musiques (artistName, title, durationInMillis) VALUES  ( ?, ?, ?)", song.ArtistName, song.Title, song.DurationInMillis)
+
 	helpers.CloseDb(db)
 	if err != nil {
 		return 0, err
@@ -81,6 +83,24 @@ func DeleteSong(songId int) error {
 	logrus.Printf("%d", rows)
 	helpers.CloseDb(db)
 	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func Update(idSong int, song models.Song) error {
+	db, err := helpers.OpenDb()
+	if err != nil {
+		logrus.Errorf("Error when opening DB: %s", err.Error())
+		return err
+	}
+	res, err := db.Exec("UPDATE musiques SET artistName = ?, title= ?, durationInMillis = ? WHERE id = ?", song.ArtistName, song.Title, song.DurationInMillis, idSong)
+
+	rows, err := res.RowsAffected()
+	logrus.Printf("%d", rows)
+	helpers.CloseDb(db)
+	if err != nil {
+		logrus.Errorf("Repository : Error in updating song %s", err.Error())
 		return err
 	}
 	return nil

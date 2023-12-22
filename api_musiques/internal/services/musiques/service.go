@@ -69,3 +69,16 @@ func DeleteSong(idSong int) error {
 
 	return nil
 }
+
+func UpdateSong(idSong int, song models.Song) error {
+	err := repository.Update(idSong, song)
+	if err != nil {
+		logrus.Errorf("error deleting ressource : %s", err.Error())
+		return &models.CustomError{
+			Message: "Something went wrong",
+			Code:    500,
+		}
+	}
+
+	return nil
+}
