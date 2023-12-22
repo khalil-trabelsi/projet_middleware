@@ -14,7 +14,7 @@ func main() {
 	router := chi.NewRouter()
 	// Our routes
 	router.Get("/ratings", ratings.GetRatings)
-	// router.Get("/ratings/{id}", ratings.GetRating)
+	router.Get("/ratings/{id}", ratings.GetRating)
 	// router.Put("/ratings/{id}", ratings.UpdateRating)
 	// router.Delete("/ratings/{id}", ratings.DeleteRating)
 	logrus.Info("[INFO] Web server started. Now listening on *:8084")

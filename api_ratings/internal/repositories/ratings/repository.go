@@ -32,3 +32,22 @@ func GetAllRatings() ([]models.Rating, error) {
 
 	return ratings, err
 }
+
+func GetRatingById(id int) (*models.Rating, error) {
+	db, err := helpers.OpenDb()
+	if err != nil {
+
+		return nil, err
+	}
+	row := db.QueryRow("SELECT * FROM ratings WHERE id=?", id)
+	helpers.CloseDb(db)
+
+	var rating models.Rating
+	err = row.Scan(&rating.Id, &rating.SongId, &rating.UserId, &rating.Comment, &rating.Note)
+
+	if err != nil {
+
+		return nil, err // Autres erreurs lors du scan
+	}
+	return &rating, err
+}
