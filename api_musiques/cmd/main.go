@@ -19,8 +19,10 @@ func main() {
 			r.Use(musiques.Ctx)
 			r.Get("/", musiques.GetSong)
 			r.Delete("/", musiques.DeleteSong)
+			r.Put("/", musiques.UpdateSong)
 		})
 		r.Post("/", musiques.AddSong)
+
 	})
 
 	logrus.Info("[INFO] Web server started. Now listening on *:8080")
@@ -34,7 +36,7 @@ func init() {
 	}
 	schemes := []string{
 		`CREATE TABLE IF NOT EXISTS musiques (
-			id VARCHAR(255) PRIMARY KEY NOT NULL UNIQUE,
+			id INTEGER  PRIMARY KEY AUTOINCREMENT,
 			artistName VARCHAR(255) NOT NULL,
 			title VARCHAR(255) NOT NULL,
 			durationInMillis INT NOT NUll
