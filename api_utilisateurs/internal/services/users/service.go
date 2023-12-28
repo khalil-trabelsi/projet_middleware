@@ -57,3 +57,34 @@ func GetUserById(id uuid.UUID) (*models.User, error) {
 
 	return user, err
 }
+
+func DeleteUser(userID uuid.UUID) error {
+	err := repository.DeleteUser(userID)
+	if err != nil {
+		logrus.Errorf("Erreur lors de la suppression du commentaire : %s", err.Error())
+		return err
+	}
+
+	return nil
+}
+
+func UpdateUser(userID uuid.UUID, updatedUser models.User) error {
+	user, err := repository.GetUserById(userID)
+	if err != nil {
+		logrus.Errorf("Erreur lors de la récupération du user : %s", err.Error())
+		return err
+	}
+
+	// Mettre à jour les champs nécessaires du commentaire récupéré avec les données du commentaire mis à jour
+	user.Name = updatedUser.Name
+	user.Email = updatedUser.Email
+	user.Password = updatedUser.Password
+
+	err = repository.UpdateUser(user)
+	if err != nil {
+		logrus.Errorf("Erreur lors de la mise à jour du user en base de données : %s", err.Error())
+		return err
+	}
+
+	return nil
+}
