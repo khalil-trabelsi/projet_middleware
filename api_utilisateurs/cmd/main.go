@@ -16,7 +16,10 @@ func main() {
 	// users------------------------------------------------------------------------------------------------------------------
 	router.Get("/users", users.GetUsers)
 	router.Get("/users/{id}", users.GetUser)
+	router.Put("/users/{id}", users.UpdateUser)
 	router.Post("/users", users.CreateUser)
+	router.Delete("/users/{id}", users.DeleteUser)
+
 	logrus.Info("[INFO] Web server started. Now listening on *:8084")
 	logrus.Fatalln(http.ListenAndServe(":8084", router))
 

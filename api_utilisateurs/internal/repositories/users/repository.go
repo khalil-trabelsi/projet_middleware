@@ -70,3 +70,36 @@ func GetUserById(id uuid.UUID) (*models.User, error) {
 	}
 	return &user, err
 }
+
+func DeleteUser(userID uuid.UUID) error {
+	db, err := helpers.OpenDB()
+	if err != nil {
+		logrus.Errorf("Erreur lors de l'ouverture de la base de données : %s", err.Error())
+		return err
+	}
+	defer helpers.CloseDB(db)
+
+	_, err = db.Exec("DELETE FROM users WHERE id=?", userID)
+	if err != nil {
+		logrus.Errorf("Erreur lors de la suppression du user dans la base de données : %s", err.Error())
+		return err
+	}
+
+	return nil
+}
+func UpdateUser(user *models.User) error {
+	db, err := helpers.OpenDB()
+	if err != nil {
+		logrus.Errorf("Erreur lors de l'ouverture de la base de données : %s", err.Error())
+		return err
+	}
+	defer helpers.CloseDB(db)
+	_, err = db.Exec("UPDATE users SET name=?, email=?, password=? WHERE id=?",
+		user.Name, user.Email, user.Password, user.ID)
+	if err != nil {
+		logrus.Errorf("Erreur lors de la mise à jour du user dans la base de données : %s", err.Error())
+		return err
+	}
+
+	return nil
+}
