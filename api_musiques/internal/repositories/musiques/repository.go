@@ -4,7 +4,7 @@ import (
 	"tchipify/musiques/internal/helpers"
 	"tchipify/musiques/internal/models"
 
-	_ "github.com/gofrs/uuid"
+	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,7 +24,7 @@ func GetAllSongs() ([]models.Song, error) {
 
 	for rows.Next() {
 		var data models.Song
-		err = rows.Scan(&data.Id, &data.ArtistName, &data.Title, &data.DurationInMillis)
+		err = rows.Scan(&data.Id, &data.Title, &data.Artist, &data.Filename, &data.Published)
 		if err != nil {
 			return nil, err
 		}
@@ -36,7 +36,7 @@ func GetAllSongs() ([]models.Song, error) {
 
 }
 
-func GetSongById(id int) (*models.Song, error) {
+func GetSongById(id uuid.UUID) (*models.Song, error) {
 	db, err := helpers.OpenDb()
 	if err != nil {
 		return nil, err
@@ -45,33 +45,29 @@ func GetSongById(id int) (*models.Song, error) {
 	helpers.CloseDb(db)
 
 	var song models.Song
-	err = row.Scan(&song.Id, &song.ArtistName, &song.Title, &song.DurationInMillis)
+	err = row.Scan(&song.Id, &song.Title, &song.Artist, &song.Filename, &song.Published)
 	if err != nil {
 		return nil, err
 	}
 	return &song, err
 }
 
-func AddSong(song models.Song) (int64, error) {
+func AddSong(song models.Song) error {
 	db, err := helpers.OpenDb()
 	if err != nil {
-		return 0, err
+		return err
 	}
 
-	result, err := db.Exec("INSERT INTO musiques (artistName, title, durationInMillis) VALUES  ( ?, ?, ?)", song.ArtistName, song.Title, song.DurationInMillis)
+	_, err = db.Exec("INSERT INTO musiques (id, title, artist, filename, published) VALUES  (?,?,?,?,?)", song.Id, song.Title, song.Artist, song.Filename, song.Published)
 
 	helpers.CloseDb(db)
 	if err != nil {
-		return 0, err
+		return err
 	}
-	id, err := result.LastInsertId()
-	if err != nil {
-		return 0, err
-	}
-	return id, nil
+	return nil
 }
 
-func DeleteSong(songId int) error {
+func DeleteSong(songId uuid.UUID) error {
 	db, err := helpers.OpenDb()
 	if err != nil {
 		return err
@@ -88,13 +84,13 @@ func DeleteSong(songId int) error {
 	return nil
 }
 
-func Update(idSong int, song models.Song) error {
+func Update(idSong uuid.UUID, song models.Song) error {
 	db, err := helpers.OpenDb()
 	if err != nil {
 		logrus.Errorf("Error when opening DB: %s", err.Error())
 		return err
 	}
-	res, err := db.Exec("UPDATE musiques SET artistName = ?, title= ?, durationInMillis = ? WHERE id = ?", song.ArtistName, song.Title, song.DurationInMillis, idSong)
+	res, err := db.Exec("UPDATE musiques SET artist = ?, title= ?, filename = ?,  published = ? WHERE id = ?", song.Artist, song.Title, song.Filename, song.Published, idSong)
 
 	rows, err := res.RowsAffected()
 	logrus.Printf("%d", rows)

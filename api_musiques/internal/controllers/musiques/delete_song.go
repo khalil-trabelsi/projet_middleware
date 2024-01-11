@@ -6,15 +6,19 @@ import (
 	"tchipify/musiques/internal/models"
 	"tchipify/musiques/internal/services/musiques"
 
-	_ "github.com/gofrs/uuid"
+	"github.com/go-chi/chi/v5"
+	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 )
 
 func DeleteSong(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	songId, _ := ctx.Value("songId").(int)
+	songId, err := uuid.FromString(chi.URLParam(r, "id"))
+	if err != nil {
+		http.Error(w, "erreur lors la recuperation de user ID", http.StatusBadRequest)
+		return
+	}
 
-	err := musiques.DeleteSong(songId)
+	err = musiques.DeleteSong(songId)
 	if err != nil {
 		logrus.Errorf("error : %s", err.Error())
 		customError, isCustom := err.(*models.CustomError)

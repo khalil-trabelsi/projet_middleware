@@ -3,16 +3,20 @@ package ratings
 import (
 	"net/http"
 
-	"github.com/sirupsen/logrus"
-
+	"strconv"
 	"tchipify/ratings/internal/services/ratings"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/sirupsen/logrus"
 )
 
 func DeleteRating(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	ratingId, _ := ctx.Value("ratingId").(int)
-	logrus.Printf("%d", ratingId)
-	err := ratings.DeleteRating(ratingId)
+	rating_id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		http.Error(w, "erreur lors la recuperation de user ID", http.StatusBadRequest)
+		return
+	}
+	err = ratings.DeleteRating(rating_id)
 	if err != nil {
 		logrus.Errorf("Erreur lors de la suppression du rating : %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)

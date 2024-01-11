@@ -9,7 +9,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func GetRatings(w http.ResponseWriter, _ *http.Request) {
+func GetRatings(w http.ResponseWriter, r *http.Request) {
+
 	// calling service
 	ratings, err := ratings.GetAllRatings()
 	if err != nil {

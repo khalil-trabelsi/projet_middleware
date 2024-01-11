@@ -1,6 +1,7 @@
 package musiques
 
 import (
+	"fmt"
 	"tchipify/ratings/internal/helpers"
 	"tchipify/ratings/internal/models"
 
@@ -12,7 +13,7 @@ func GetAllRatings() ([]models.Rating, error) {
 	if err != nil {
 		return nil, err
 	}
-	rows, err := db.Query("SELECT * FROM rating")
+	rows, err := db.Query("SELECT * FROM ratings ")
 	helpers.CloseDb(db)
 	if err != nil {
 		return nil, err
@@ -21,7 +22,7 @@ func GetAllRatings() ([]models.Rating, error) {
 	ratings := []models.Rating{}
 	for rows.Next() {
 		var data models.Rating
-		err = rows.Scan(&data.Id, &data.UserId, &data.SongId, &data.Comment, &data.Note)
+		err = rows.Scan(&data.Id, &data.UserId, &data.SongId, &data.Content, &data.Date, &data.Rating)
 		if err != nil {
 			return nil, err
 		}
@@ -39,11 +40,13 @@ func GetRatingById(id int) (*models.Rating, error) {
 
 		return nil, err
 	}
-	row := db.QueryRow("SELECT * FROM rating WHERE id=?", id)
+	fmt.Println(id)
+	row := db.QueryRow("SELECT * FROM ratings WHERE id=?  ", id)
 	helpers.CloseDb(db)
 
 	var rating models.Rating
-	err = row.Scan(&rating.Id, &rating.SongId, &rating.UserId, &rating.Comment, &rating.Note)
+	err = row.Scan(&rating.Id, &rating.UserId, &rating.SongId, &rating.Content, &rating.Date, &rating.Rating)
+	logrus.Println(err)
 
 	if err != nil {
 
@@ -53,6 +56,7 @@ func GetRatingById(id int) (*models.Rating, error) {
 }
 
 func CreateRating(rating models.Rating) (int64, error) {
+	fmt.Println(rating)
 	db, err := helpers.OpenDb()
 	if err != nil {
 		logrus.Errorf("Erreur lors de l'ouverture de la base de données : %s", err.Error())
@@ -60,8 +64,8 @@ func CreateRating(rating models.Rating) (int64, error) {
 	}
 	defer helpers.CloseDb(db)
 
-	result, err := db.Exec("INSERT INTO rating (song_id, user_id, comment, note ) VALUES (?, ?, ?, ?)",
-		rating.SongId, rating.UserId, rating.Comment, rating.Note)
+	result, err := db.Exec("INSERT INTO ratings (user_id, song_id, content, rating, date ) VALUES (?, ?, ?, ?,?) ",
+		rating.UserId, rating.SongId, rating.Content, rating.Rating, rating.Date)
 	if err != nil {
 		logrus.Errorf("Erreur lors de l'insertion du rating dans la base de données : %s", err.Error())
 		return 0, err
@@ -78,11 +82,10 @@ func UpdateRating(ratingID int, rating models.Rating) error {
 		logrus.Errorf("Error when opening DB: %s", err.Error())
 		return err
 	}
-	res, err := db.Exec("UPDATE rating SET user_id = ?, song_id= ?, comment = ?, note = ? WHERE id = ?", rating.UserId, rating.SongId, rating.Comment, rating.Note, ratingID)
+	res, err := db.Exec("UPDATE ratings SET content = ?, rating = ? WHERE   id = ?", rating.Content, rating.Rating, ratingID)
 
-	rows, err := res.RowsAffected()
-	logrus.Printf("%d", rows)
-	defer helpers.CloseDb(db)
+	logrus.Printf("%d", res)
+	helpers.CloseDb(db)
 	if err != nil {
 		logrus.Errorf("Repository : Error in updating rating %s", err.Error())
 		return err
@@ -98,7 +101,7 @@ func DeleteRating(ratingID int) error {
 	}
 	defer helpers.CloseDb(db)
 
-	_, err = db.Exec("DELETE FROM rating WHERE id=?", ratingID)
+	_, err = db.Exec("DELETE FROM ratings WHERE  id=?", ratingID)
 	if err != nil {
 		logrus.Errorf("Erreur lors de la suppression du rating dans la base de données : %s", err.Error())
 		return err

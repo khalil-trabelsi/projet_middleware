@@ -1,10 +1,13 @@
 package models
 
-
+import (
+	"github.com/gofrs/uuid"
+)
 
 type Song struct {
-	Id int64 `json:"id"`
-	ArtistName string `json:"artistName"`
-	Title string `json:"title"`
-	DurationInMillis int64 `json:"durationInMillis"`
+	Id        *uuid.UUID `json:"id"`
+	Title     string     `json:"title"`
+	Artist    string     `json:"artist"`
+	Filename  string     `json:"filename"`
+	Published string     `json:"published"`
 }

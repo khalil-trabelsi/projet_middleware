@@ -4,18 +4,22 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"tchipify/ratings/internal/models"
 	"tchipify/ratings/internal/services/ratings"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/sirupsen/logrus"
 )
 
 func UpdateRating(w http.ResponseWriter, r *http.Request) {
 	var rating models.Rating
 
-	ctx := r.Context()
-	ratingId, _ := ctx.Value("ratingId").(int)
-
+	rating_id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		http.Error(w, "erreur lors la recuperation de user ID", http.StatusBadRequest)
+		return
+	}
 	r.Header.Set("Content-type", "application/json")
 	error2 := json.NewDecoder(r.Body).Decode(&rating)
 
@@ -23,9 +27,8 @@ func UpdateRating(w http.ResponseWriter, r *http.Request) {
 		logrus.Errorf("Erreur de décodage JSON")
 		http.Error(w, "Erreur de décodage json", http.StatusBadRequest)
 	}
-	erro := ratings.UpdateRating(ratingId, rating)
+	erro := ratings.UpdateRating(rating_id, rating)
 	if erro != nil {
-		// logging error
 		logrus.Errorf("error in controller update rating : %s", erro.Error())
 		customError, isCustom := erro.(*models.CustomError)
 		if isCustom {

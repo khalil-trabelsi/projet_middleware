@@ -1,15 +1,24 @@
 package musiques
+
 import (
-	_"github.com/gofrs/uuid"
 	"encoding/json"
-	"github.com/sirupsen/logrus"
+	"net/http"
 	"tchipify/musiques/internal/models"
 	"tchipify/musiques/internal/services/musiques"
-	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/gofrs/uuid"
+	"github.com/sirupsen/logrus"
 )
+
 func GetSong(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	songId, _ := ctx.Value("songId").(int)
+	// ctx := r.Context()
+	songId, err := uuid.FromString(chi.URLParam(r, "id"))
+	if err != nil {
+		http.Error(w, "erreur lors la recuperation de user ID", http.StatusBadRequest)
+		return
+	}
+	// songId, _ := ctx.Value("songId").(uuid.UUID)
 
 	song, err := musiques.GetSongById(songId)
 	if err != nil {

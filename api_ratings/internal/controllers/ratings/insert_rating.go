@@ -6,11 +6,13 @@ import (
 	"net/http"
 	"tchipify/ratings/internal/models"
 	"tchipify/ratings/internal/services/ratings"
+	"time"
 
 	"github.com/sirupsen/logrus"
 )
 
 func InsertRating(w http.ResponseWriter, r *http.Request) {
+
 	var newRating models.Rating
 	r.Header.Set("Content-type", "application/json")
 	err := json.NewDecoder(r.Body).Decode(&newRating)
@@ -19,6 +21,7 @@ func InsertRating(w http.ResponseWriter, r *http.Request) {
 		logrus.Errorf("Erreur de décodage JSON")
 		http.Error(w, "Erreur de décodage json", http.StatusBadRequest)
 	}
+	newRating.Date = time.Now().Format("2006-01-02 15:04:05")
 	idRating, err := ratings.CreateRating(newRating)
 	if err != nil {
 		// logging error

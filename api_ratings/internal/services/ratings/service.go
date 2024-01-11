@@ -14,6 +14,7 @@ func GetAllRatings() ([]models.Rating, error) {
 	var err error
 	// calling repository
 	ratings, err := repository.GetAllRatings()
+	logrus.Error(err)
 	// managing errors
 	if err != nil {
 		logrus.Errorf("error retrieving collections : %s", err.Error())
@@ -67,8 +68,8 @@ func DeleteRating(ratingID int) error {
 	return nil
 }
 
-func UpdateRating(ratingID int, song models.Rating) error {
-	err := repository.UpdateRating(ratingID, song)
+func UpdateRating(ratingID int, rating models.Rating) error {
+	err := repository.UpdateRating(ratingID, rating)
 	if err != nil {
 		logrus.Errorf("error updating ressource : %s", err.Error())
 		return &models.CustomError{
