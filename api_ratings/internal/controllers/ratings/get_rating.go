@@ -2,19 +2,20 @@ package ratings
 
 import (
 	"encoding/json"
+	"strconv"
 
 	"net/http"
 	"tchipify/ratings/internal/models"
 	"tchipify/ratings/internal/services/ratings"
 
+	"github.com/go-chi/chi/v5"
 	_ "github.com/go-chi/chi/v5"
 	"github.com/sirupsen/logrus"
 )
 
 func GetRating(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	ratingId, _ := ctx.Value("ratingId").(int)
-	rating, err := ratings.GetRatingById(ratingId)
+	rating_id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	rating, err := ratings.GetRatingById(rating_id)
 	if err != nil {
 		logrus.Errorf("error in controller : %s", err.Error())
 		customError, isCustom := err.(*models.CustomError)

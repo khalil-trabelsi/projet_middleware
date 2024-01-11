@@ -13,7 +13,7 @@ import (
 func main() {
 
 	router := chi.NewRouter()
-	// users------------------------------------------------------------------------------------------------------------------
+
 	router.Get("/users", users.GetUsers)
 	router.Get("/users/{id}", users.GetUser)
 	router.Put("/users/{id}", users.UpdateUser)
@@ -31,14 +31,11 @@ func init() {
 		logrus.Fatalf("error while opening users database : %s", err.Error())
 	}
 
-	// users------------------------------------------------------------------------------------------------------------------
-
 	user_schemes := []string{
 		`CREATE TABLE IF NOT EXISTS users (
 			id UUID PRIMARY KEY,
 			name VARCHAR(255) NOT NULL,
-			email VARCHAR(255) NOT NULL,
-			password VARCHAR(255) NOT NULL
+			username VARCHAR(255) NOT NULL
 			
 		);`,
 	}

@@ -77,8 +77,7 @@ func UpdateUser(userID uuid.UUID, updatedUser models.User) error {
 
 	// Mettre à jour les champs nécessaires du commentaire récupéré avec les données du commentaire mis à jour
 	user.Name = updatedUser.Name
-	user.Email = updatedUser.Email
-	user.Password = updatedUser.Password
+	user.Username = updatedUser.Username
 
 	err = repository.UpdateUser(user)
 	if err != nil {

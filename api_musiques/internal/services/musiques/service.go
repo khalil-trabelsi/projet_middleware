@@ -7,7 +7,7 @@ import (
 	"tchipify/musiques/internal/models"
 	repository "tchipify/musiques/internal/repositories/musiques"
 
-	_ "github.com/gofrs/uuid"
+	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -25,7 +25,7 @@ func GetAllSongs() ([]models.Song, error) {
 	return songs, nil
 }
 
-func GetSongById(id int) (*models.Song, error) {
+func GetSongById(id uuid.UUID) (*models.Song, error) {
 	song, err := repository.GetSongById(id)
 	if err != nil {
 		if errors.As(err, &sql.ErrNoRows) {
@@ -44,20 +44,20 @@ func GetSongById(id int) (*models.Song, error) {
 	return song, err
 }
 
-func AddSong(song models.Song) (int64, error) {
-	id, err := repository.AddSong(song)
+func AddSong(song models.Song) error {
+	err := repository.AddSong(song)
 	if err != nil {
 		logrus.Errorf("error creating ressource : %s", err.Error())
-		return 0, &models.CustomError{
+		return &models.CustomError{
 			Message: "Something went wrong",
 			Code:    422,
 		}
 	}
 
-	return id, nil
+	return nil
 }
 
-func DeleteSong(idSong int) error {
+func DeleteSong(idSong uuid.UUID) error {
 	err := repository.DeleteSong(idSong)
 	if err != nil {
 		logrus.Errorf("error deleting ressource : %s", err.Error())
@@ -70,10 +70,10 @@ func DeleteSong(idSong int) error {
 	return nil
 }
 
-func UpdateSong(idSong int, song models.Song) error {
+func UpdateSong(idSong uuid.UUID, song models.Song) error {
 	err := repository.Update(idSong, song)
 	if err != nil {
-		logrus.Errorf("error deleting ressource : %s", err.Error())
+		logrus.Errorf("error updating ressource : %s", err.Error())
 		return &models.CustomError{
 			Message: "Something went wrong",
 			Code:    500,

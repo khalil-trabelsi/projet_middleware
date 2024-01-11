@@ -7,8 +7,7 @@ import (
 	_ "tchipify/musiques/internal/models"
 	"tchipify/musiques/internal/services/musiques"
 
-	"fmt"
-
+	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -16,14 +15,23 @@ func AddSong(w http.ResponseWriter, r *http.Request) {
 	var song models.Song
 
 	r.Header.Set("Content-type", "application/json")
+	print(r.Body)
 	err := json.NewDecoder(r.Body).Decode(&song)
 
 	if err != nil {
 		logrus.Errorf("Erreur de décodage JSON")
 		http.Error(w, "Erreur de décodage json", http.StatusBadRequest)
+		return
 	}
+	id, err := uuid.NewV4()
+	if err != nil {
+		logrus.Errorf("Erreur lors de la génération de l'identifiant UUID : %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	song.Id = &id
 
-	idSong, err := musiques.AddSong(song)
+	err = musiques.AddSong(song)
 	if err != nil {
 		// logging error
 		logrus.Errorf("error : %s", err.Error())
@@ -40,9 +48,6 @@ func AddSong(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
-
-	uri := fmt.Sprintf("/songs/%d", idSong)
-
-	w.Header().Add("Location", uri)
-	json.NewEncoder(w).Encode(map[string]int64{"idSong": idSong})
+	body, _ := json.Marshal(song)
+	_, _ = w.Write(body)
 }

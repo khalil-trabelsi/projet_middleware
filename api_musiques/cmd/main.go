@@ -36,10 +36,11 @@ func init() {
 	}
 	schemes := []string{
 		`CREATE TABLE IF NOT EXISTS musiques (
-			id INTEGER  PRIMARY KEY AUTOINCREMENT,
-			artistName VARCHAR(255) NOT NULL,
+			id string  PRIMARY KEY,
 			title VARCHAR(255) NOT NULL,
-			durationInMillis INT NOT NUll
+			artist VARCHAR(255) NOT NULL,
+			filename VARCHAR(255) NOT NULL,
+			published VARCHAR(255) NOT NULL
 		);`,
 	}
 	for _, scheme := range schemes {

@@ -2,13 +2,15 @@ package musiques
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"tchipify/musiques/internal/models"
 	_ "tchipify/musiques/internal/models"
 	"tchipify/musiques/internal/services/musiques"
 
-	"fmt"
+	"github.com/go-chi/chi/v5"
 
+	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
 )
 
@@ -16,11 +18,14 @@ func UpdateSong(w http.ResponseWriter, r *http.Request) {
 
 	var song models.Song
 
-	ctx := r.Context()
-	songId, _ := ctx.Value("songId").(int)
+	songId, err := uuid.FromString(chi.URLParam(r, "id"))
+	if err != nil {
+		http.Error(w, "erreur lors la recuperation de user ID", http.StatusBadRequest)
+		return
+	}
 
 	// Test if the song exist in the Db else Throw an error to the client
-	_, err := musiques.GetSongById(songId)
+	_, err = musiques.GetSongById(songId)
 	if err != nil {
 		logrus.Errorf("error : %s", err.Error())
 		customError, isCustom := err.(*models.CustomError)
@@ -44,7 +49,7 @@ func UpdateSong(w http.ResponseWriter, r *http.Request) {
 	erro := musiques.UpdateSong(songId, song)
 	if erro != nil {
 		// logging error
-		logrus.Errorf("error : %s", erro.Error())
+		logrus.Errorf("error in controller update song : %s", erro.Error())
 		customError, isCustom := erro.(*models.CustomError)
 		if isCustom {
 			// writing http code in header
@@ -58,8 +63,11 @@ func UpdateSong(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-
 	uri := fmt.Sprintf("/songs/%d", song.Id)
+	song.Id = &songId
+	body, _ := json.Marshal(song)
+	_, _ = w.Write(body)
 
 	w.Header().Add("Location", uri)
+	return
 }
